@@ -4,7 +4,8 @@ LDFLAGS?=-nostdlib
 
 all: kernel.bin
 
-OBJS+=main.o
+OBJS+=main.o \
+terminal.o
 
 BOOT_DIR=boot
 include $(BOOT_DIR)/Makefile
