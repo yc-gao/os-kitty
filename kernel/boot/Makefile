@@ -1,0 +1,1 @@
+OBJS += $(BOOT_DIR)/boot.o
