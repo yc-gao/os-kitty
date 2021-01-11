@@ -30,4 +30,4 @@ kernel.iso: kernel.bin
 	rm -rf isodir
 
 clean:
-	rm -rf kernel.bin $(OBJS)
+	rm -rf kernel.iso kernel.bin $(OBJS)
