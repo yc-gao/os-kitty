@@ -9,5 +9,5 @@ void kernel_main(void) {
   terminal_initialize();
 
   /* Newline support is left as an exercise. */
-  puts("Hello, kernel World!\n");
+  terminal_puts("Hello, kernel World!");
 }

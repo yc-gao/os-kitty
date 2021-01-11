@@ -2,5 +2,7 @@
 
 void terminal_initialize();
 
-int putc(char);
-int puts(const char *);
+int terminal_scroll(int);
+
+int terminal_putc(char);
+int terminal_puts(const char *);

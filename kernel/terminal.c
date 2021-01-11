@@ -2,6 +2,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "string.h"
+
 /* Hardware text mode color constants. */
 enum vga_color {
   VGA_COLOR_BLACK = 0,
@@ -28,12 +30,6 @@ static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) {
 
 static inline uint16_t vga_entry(unsigned char uc, uint8_t color) {
   return (uint16_t)uc | (uint16_t)color << 8;
-}
-
-size_t strlen(const char* str) {
-  size_t len = 0;
-  while (str[len]) len++;
-  return len;
 }
 
 static const size_t VGA_WIDTH = 80;
@@ -64,21 +60,40 @@ void terminal_putentryat(char c, uint8_t color, size_t x, size_t y) {
   terminal_buffer[index] = vga_entry(c, color);
 }
 
-int terminal_putchar(char c) {
-  terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
-  if (++terminal_column == VGA_WIDTH) {
+int terminal_scroll(int n) {
+  memcpy(terminal_buffer, terminal_buffer + VGA_WIDTH * n,
+         2 * (terminal_row * VGA_WIDTH + terminal_column - VGA_WIDTH * n));
+  terminal_row -= n;
+  for (size_t y = terminal_row; y < VGA_HEIGHT; y++) {
+    for (size_t x = terminal_column; x < VGA_WIDTH; x++) {
+      const size_t index = y * VGA_WIDTH + x;
+      terminal_buffer[index] = vga_entry(' ', terminal_color);
+    }
+  }
+
+  return n;
+}
+
+int terminal_putc(char c) {
+  if (c == '\r') {
     terminal_column = 0;
-    if (++terminal_row == VGA_HEIGHT) terminal_row = 0;
+  } else if (c == '\n') {
+    terminal_column = 0;
+    if (++terminal_row == VGA_HEIGHT) terminal_scroll(1);
+  } else {
+    terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
+    if (++terminal_column == VGA_WIDTH) {
+      terminal_column = 0;
+      if (++terminal_row == VGA_HEIGHT) terminal_scroll(1);
+    }
   }
   return c;
 }
 
-int putc(char c) { return terminal_putchar(c); }
-
-int puts(const char* str) {
+int terminal_puts(const char* str) {
   int num = 0;
   while (str[num] != '\0') {
-    putc(str[num++]);
+    terminal_putc(str[num++]);
   }
   return num;
 }
