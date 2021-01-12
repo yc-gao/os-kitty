@@ -25,7 +25,7 @@ kernel.iso: kernel.bin
 	rm -rf isodir
 	mkdir -p isodir/boot/grub
 	cp $< isodir/boot/
-	echo "menuentry \"os\" {\n    multiboot /boot/$^\n}" > isodir/boot/grub/grub.cfg
+	echo -e "menuentry \"os\" {\n    multiboot /boot/$^\n}" > isodir/boot/grub/grub.cfg
 	grub-mkrescue -o $@ isodir
 	rm -rf isodir
 
